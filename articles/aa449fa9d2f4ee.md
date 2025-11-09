@@ -3,7 +3,7 @@ title: "CSS scroll-stateクエリで実現する自動隠れヘッダー機能"
 emoji: "📜"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["css", "frontend", "scroll", "web"]
-published: false
+published: true
 ---
 
 ## はじめに
