@@ -2,7 +2,7 @@
 title: "業務フロー図は書けるのに、DFDが書けない理由"
 emoji: "🔄"
 type: "tech"
-topics: ["DFD", "要件定義", "UML", "システム開発"]
+topics: ["dfd", "requirements", "uml", "systemdevelopment"]
 published: true
 ---
 
