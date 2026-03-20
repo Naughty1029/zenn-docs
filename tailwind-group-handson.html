@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tailwind CSS の group 機能 完全ハンズオン</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: #f9f8f6;
+    color: #1a1a18;
+    line-height: 1.8;
+    font-size: 15px;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3rem 2rem 6rem;
+  }
+
+  /* Header */
+  .article-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e8e6e0;
+  }
+
+  .tag-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: .04em;
+  }
+  .tag-tw { background: #dbeafe; color: #1e40af; }
+  .tag-beginner { background: #dcfce7; color: #166534; }
+  .tag-handson { background: #fef3c7; color: #92400e; }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    letter-spacing: -.02em;
+  }
+
+  .article-meta {
+    font-size: 13px;
+    color: #888;
+  }
+
+  /* TOC */
+  .toc {
+    background: #f0ede6;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 3rem;
+  }
+  .toc-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: .75rem;
+  }
+  .toc ol {
+    padding-left: 1.25rem;
+  }
+  .toc li {
+    font-size: 13px;
+    margin-bottom: .3rem;
+  }
+  .toc a {
+    color: #444;
+    text-decoration: none;
+  }
+  .toc a:hover { color: #1a1a18; text-decoration: underline; }
+
+  /* Sections */
+  .section {
+    margin-bottom: 3rem;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    padding-top: 2rem;
+    letter-spacing: -.02em;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: .75rem;
+    color: #333;
+  }
+
+  p {
+    margin-bottom: 1rem;
+    color: #333;
+  }
+
+  /* Code */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: #ece9e2;
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: #c2410c;
+  }
+
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.8;
+    background: #1e1e1c;
+    color: #d4d0c8;
+    border-radius: 10px;
+    padding: 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.5rem;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: 13px;
+  }
+
+  /* Syntax highlight */
+  .kw { color: #c084fc; }  /* keyword: class, div */
+  .cl { color: #67e8f9; }  /* class name */
+  .at { color: #86efac; }  /* attribute */
+  .st { color: #fde68a; }  /* string */
+  .cm { color: #6b7280; font-style: italic; } /* comment */
+  .tg { color: #f9a8d4; }  /* tag */
+
+  /* Demo boxes */
+  .demo-wrap {
+    border: 1px solid #e0ddd6;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1rem 0 1.5rem;
+  }
+  .demo-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: #888;
+    text-transform: uppercase;
+    background: #f0ede6;
+    padding: 7px 14px;
+    border-bottom: 1px solid #e0ddd6;
+  }
+  .demo-body {
+    padding: 1.5rem;
+    background: #fff;
+  }
+
+  /* Callout boxes */
+  .callout {
+    border-left: 3px solid;
+    padding: .75rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 1rem 0;
+    font-size: 14px;
+  }
+  .callout-info {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    color: #1e40af;
+  }
+  .callout-warn {
+    border-color: #f59e0b;
+    background: #fffbeb;
+    color: #92400e;
+  }
+  .callout-tip {
+    border-color: #10b981;
+    background: #f0fdf4;
+    color: #166534;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: .25rem;
+  }
+
+  /* Live demo elements */
+  .card-hover-demo {
+    display: inline-block;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: border-color .2s;
+    min-width: 200px;
+  }
+  .card-hover-demo:hover { border-color: #3b82f6; }
+  .card-hover-demo .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    transition: color .2s;
+  }
+  .card-hover-demo:hover .card-title { color: #2563eb; }
+  .card-hover-demo .card-link {
+    font-size: 12px;
+    color: #2563eb;
+    opacity: 0;
+    transition: opacity .2s;
+    margin-top: 4px;
+  }
+  .card-hover-demo:hover .card-link { opacity: 1; }
+
+  .named-demo {
+    display: inline-block;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 1rem;
+    cursor: pointer;
+    min-width: 220px;
+  }
+  .named-demo .outer-text {
+    font-size: 13px;
+    font-weight: 500;
+    transition: color .2s;
+    margin-bottom: .5rem;
+  }
+  .named-demo:hover .outer-text { color: #2563eb; }
+  .named-demo .inner-btn {
+    display: inline-block;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .named-demo .inner-text {
+    font-size: 12px;
+    color: #6b7280;
+    transition: color .2s;
+  }
+  .named-demo .inner-btn:hover .inner-text { color: #dc2626; }
+
+  .peer-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 200px;
+  }
+  .peer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .peer-row input[type=checkbox] {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+  .peer-label {
+    font-size: 13px;
+    transition: all .2s;
+  }
+
+  .data-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 360px;
+  }
+  .msg-row {
+    display: flex;
+  }
+  .msg-row.user { justify-content: flex-end; }
+  .msg-bubble {
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    max-width: 80%;
+  }
+  .msg-bubble.user-bubble {
+    background: #e4e4e7;
+    color: #18181b;
+  }
+  .msg-bubble.ai-bubble {
+    color: #333;
+  }
+
+  /* Step list */
+  .step-list {
+    counter-reset: step;
+    list-style: none;
+    padding: 0;
+  }
+  .step-list li {
+    counter-increment: step;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+  }
+  .step-list li::before {
+    content: counter(step);
+    min-width: 24px;
+    height: 24px;
+    background: #1a1a18;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Separator */
+  hr {
+    border: none;
+    border-top: 1px solid #e8e6e0;
+    margin: 2.5rem 0;
+  }
+
+  /* Summary table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 1rem 0 1.5rem;
+  }
+  th {
+    background: #1a1a18;
+    color: #fff;
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 500;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e8e6e0;
+    color: #444;
+  }
+  tr:nth-child(even) td { background: #f5f3ee; }
+
+  /* Final callout */
+  .final-box {
+    background: #1a1a18;
+    color: #f5f3ee;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-top: 2rem;
+  }
+  .final-box h3 { color: #fff; margin-top: 0; }
+  .final-box code { background: #333; color: #86efac; }
+  .final-box p { color: #ccc; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header class="article-header">
+    <div class="tag-row">
+      <span class="tag tag-tw">Tailwind CSS</span>
+      <span class="tag tag-beginner">初心者向け</span>
+      <span class="tag tag-handson">ハンズオン</span>
+    </div>
+    <h1>Tailwind CSS の group 機能<br>ゼロから学ぶハンズオン</h1>
+    <div class="article-meta">読了目安：15分 ／ 対象：Tailwind基礎は触ったことがある方</div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-title">目次</div>
+    <ol>
+      <li><a href="#s1">group とは何か</a></li>
+      <li><a href="#s2">基本的な使い方（group-hover）</a></li>
+      <li><a href="#s3">兄弟要素への伝達：peer との違い</a></li>
+      <li><a href="#s4">名前付き group（group/名前）</a></li>
+      <li><a href="#s5">data 属性との組み合わせ</a></li>
+      <li><a href="#s6">まとめ：どれをいつ使うか</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1 -->
+  <section class="section" id="s1">
+    <h2>1. group とは何か</h2>
+    <p>
+      通常の CSS（および Tailwind）は「ある要素にホバーしたら<em>その要素自身</em>のスタイルを変える」のが基本です。
+      でも実際の UI では「カードにホバーしたら、その中のタイトルだけ色を変えたい」というケースがよくあります。
+    </p>
+    <p>
+      純粋な CSS で書くと <code>.card:hover .card-title { color: blue; }</code> のように親セレクタを使いますが、
+      Tailwind はユーティリティクラスだけで CSS を書くのが原則のため、これを直接書く場所がありません。
+    </p>
+    <p>
+      そこで登場するのが <strong>group</strong> です。<br>
+      <strong>親要素に <code>group</code> クラスをつけ、子要素で <code>group-hover:</code> などのプレフィックスを使う</strong>ことで、
+      「親の状態に応じて子のスタイルを変える」が Tailwind だけで完結できます。
+    </p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">ポイント</div>
+      group は「親の状態を子に伝えるための仕組み」です。
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="section" id="s2">
+    <h2>2. 基本的な使い方（group-hover）</h2>
+    <p>もっとも使われるのは <code>group-hover:</code> です。実際に手を動かしながら覚えましょう。</p>
+
+    <h3>手順</h3>
+    <ol class="step-list">
+      <li>スタイルを変化のきっかけにしたい親要素に <code>group</code> クラスをつける</li>
+      <li>スタイルを変えたい子要素に <code>group-hover:Tailwindクラス</code> をつける</li>
+      <li>デフォルト状態のクラスも忘れずに書く（例：<code>opacity-0</code> → <code>group-hover:opacity-100</code>）</li>
+    </ol>
+
+    <pre><code><span class="cm">&lt;!-- 親に group をつける --&gt;</span>
+<span class="tg">&lt;div</span> <span class="at">class</span>=<span class="st">"group cursor-pointer border rounded-xl p-4"</span><span class="tg">&gt;</span>
+
+  <span class="cm">&lt;!-- ホバーで文字色を青に変える --&gt;</span>
+  <span class="tg">&lt;h2</span> <span class="at">class</span>=<span class="st">"text-gray-800 group-hover:text-blue-600"</span><span class="tg">&gt;</span>
+    カードタイトル
+  <span class="tg">&lt;/h2&gt;</span>
+
+  <span class="cm">&lt;!-- ホバーで「続きを読む」を表示 --&gt;</span>
+  <span class="tg">&lt;p</span> <span class="at">class</span>=<span class="st">"opacity-0 group-hover:opacity-100 text-sm text-blue-500"</span><span class="tg">&gt;</span>
+    続きを読む →
+  <span class="tg">&lt;/p&gt;</span>
+
+<span class="tg">&lt;/div&gt;</span></code></pre>
+
+    <div class="demo-wrap">
+      <div class="demo-label">ライブデモ — カードにホバーしてみて</div>
+      <div class="demo-body">
+        <div class="card-hover-demo">
+          <div class="card-title">カードタイトル</div>
+          <div class="card-link">続きを読む →</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">書き方のコツ</div>
+      <code>group-hover:</code> の後には通常の Tailwind クラスをそのまま書けます。<br>
+      例：<code>group-hover:scale-105</code>、<code>group-hover:bg-blue-50</code>、<code>group-hover:translate-x-1</code>
+    </div>
+
+    <h3>group-hover 以外のバリアントも使える</h3>
+    <p>hover 以外にも、<code>group-focus:</code>、<code>group-active:</code>、<code>group-disabled:</code> なども同じ要領で使えます。</p>
+
+    <pre><code><span class="cm">&lt;!-- インプットにフォーカスが当たったらラベルを強調 --&gt;</span>
+<span class="tg">&lt;div</span> <span class="at">class</span>=<span class="st">"group"</span><span class="tg">&gt;</span>
+  <span class="tg">&lt;label</span> <span class="at">class</span>=<span class="st">"text-gray-500 group-focus-within:text-blue-600"</span><span class="tg">&gt;</span>
+    メールアドレス
+  <span class="tg">&lt;/label&gt;</span>
+  <span class="tg">&lt;input</span> <span class="at">type</span>=<span class="st">"email"</span> <span class="at">class</span>=<span class="st">"border rounded p-2 w-full"</span> <span class="tg">/&gt;</span>
+<span class="tg">&lt;/div&gt;</span></code></pre>
+  </section>
+
+  <hr>
+
+  <!-- 3 -->
+  <section class="section" id="s3">
+    <h2>3. 兄弟要素への伝達：peer との違い</h2>
+    <p>
+      <code>group</code> と混同しやすいのが <strong>peer</strong> です。
+      違いを一言で言うと：
+    </p>
+
+    <table>
+      <thead>
+        <tr><th>機能</th><th>関係</th><th>典型的なユースケース</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>group</code></td><td>親 → 子</td><td>カードホバーで中のテキストを変える</td></tr>
+        <tr><td><code>peer</code></td><td>兄弟 → 次の兄弟</td><td>チェックボックスの状態でラベルを変える</td></tr>
+      </tbody>
+    </table>
+
+    <pre><code><span class="cm">&lt;!-- peer: 兄弟要素の状態を次の兄弟に伝える --&gt;</span>
+<span class="tg">&lt;label&gt;</span>
+  <span class="cm">&lt;!-- 状態の発信元に peer をつける --&gt;</span>
+  <span class="tg">&lt;input</span> <span class="at">type</span>=<span class="st">"checkbox"</span> <span class="at">class</span>=<span class="st">"peer"</span> <span class="tg">/&gt;</span>
+
+  <span class="cm">&lt;!-- peer-checked: でチェック時のスタイルを指定 --&gt;</span>
+  <span class="tg">&lt;span</span> <span class="at">class</span>=<span class="st">"peer-checked:line-through peer-checked:text-gray-400"</span><span class="tg">&gt;</span>
+    牛乳を買う
+  <span class="tg">&lt;/span&gt;</span>
+<span class="tg">&lt;/label&gt;</span></code></pre>
+
+    <div class="demo-wrap">
+      <div class="demo-label">ライブデモ — チェックしてみて</div>
+      <div class="demo-body">
+        <div class="peer-demo">
+          <label class="peer-row">
+            <input type="checkbox" onchange="var l=this.nextElementSibling;l.style.textDecoration=this.checked?'line-through':'none';l.style.color=this.checked?'#9ca3af':'#374151'">
+            <span class="peer-label" style="color:#374151">牛乳を買う</span>
+          </label>
+          <label class="peer-row">
+            <input type="checkbox" onchange="var l=this.nextElementSibling;l.style.textDecoration=this.checked?'line-through':'none';l.style.color=this.checked?'#9ca3af':'#374151'">
+            <span class="peer-label" style="color:#374151">コーヒーを買う</span>
+          </label>
+          <label class="peer-row">
+            <input type="checkbox" onchange="var l=this.nextElementSibling;l.style.textDecoration=this.checked?'line-through':'none';l.style.color=this.checked?'#9ca3af':'#374151'">
+            <span class="peer-label" style="color:#374151">パンを買う</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">peerの制約</div>
+      peer は <strong>後ろの兄弟要素</strong> にしか影響できません。HTML の順番が重要です。
+      チェックボックスをラベルの後に書くと効かないので注意してください。
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 4 -->
+  <section class="section" id="s4">
+    <h2>4. 名前付き group（group/名前）</h2>
+    <p>
+      コンポーネントがネストされると、「どの <code>group</code> 親を参照しているか」が曖昧になります。
+      たとえばカードの中にボタンがあって、「カードにホバー」と「ボタンにホバー」で別々の動きをさせたいケースです。
+    </p>
+    <p>
+      そこで <strong>グループに名前をつける</strong> ことができます。
+      名前は <code>group/card</code> のようにスラッシュ区切りで自由につけられます。
+    </p>
+
+    <pre><code><span class="cm">&lt;!-- 外側のグループに "card" という名前をつける --&gt;</span>
+<span class="tg">&lt;div</span> <span class="at">class</span>=<span class="st">"group/card"</span><span class="tg">&gt;</span>
+
+  <span class="cm">&lt;!-- /card の親にホバーで反応 --&gt;</span>
+  <span class="tg">&lt;h2</span> <span class="at">class</span>=<span class="st">"group-hover/card:text-blue-600"</span><span class="tg">&gt;</span>
+    カードにホバーで青くなる
+  <span class="tg">&lt;/h2&gt;</span>
+
+  <span class="cm">&lt;!-- 内側のグループに "btn" という名前をつける --&gt;</span>
+  <span class="tg">&lt;button</span> <span class="at">class</span>=<span class="st">"group/btn"</span><span class="tg">&gt;</span>
+
+    <span class="cm">&lt;!-- /btn の親にホバーで反応 --&gt;</span>
+    <span class="tg">&lt;span</span> <span class="at">class</span>=<span class="st">"group-hover/btn:text-red-500"</span><span class="tg">&gt;</span>
+      ボタンにホバーで赤くなる
+    <span class="tg">&lt;/span&gt;</span>
+
+  <span class="tg">&lt;/button&gt;</span>
+<span class="tg">&lt;/div&gt;</span></code></pre>
+
+    <div class="demo-wrap">
+      <div class="demo-label">ライブデモ — カード全体 vs ボタン、ホバーの反応が別々</div>
+      <div class="demo-body">
+        <div class="named-demo">
+          <div class="outer-text">カードにホバー → このテキストが青くなる</div>
+          <div class="inner-btn" onmouseenter="this.querySelector('.inner-text').style.color='#dc2626'" onmouseleave="this.querySelector('.inner-text').style.color='#6b7280'">
+            <span class="inner-text">ボタンにホバー → これが赤くなる</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p>名前がない場合は一番近い祖先の <code>group</code> を参照するため、入れ子が深くなると意図しない動作になることがあります。ネストするときは名前をつける習慣をつけておくと安全です。</p>
+  </section>
+
+  <hr>
+
+  <!-- 5 -->
+  <section class="section" id="s5">
+    <h2>5. data 属性との組み合わせ</h2>
+    <p>
+      <code>group</code> は hover などの疑似クラスだけでなく、<strong>HTML の data 属性</strong> とも組み合わせられます。
+      これを使うと「同じ HTML 構造でも data 属性の値によって見た目を切り替える」ことが CSS も JS も書かずに実現できます。
+    </p>
+    <p>
+      最初に見たチャット UI のコードはまさにこの活用例です。
+    </p>
+
+    <pre><code><span class="cm">&lt;!-- data-role の値に応じてスタイルを変える --&gt;</span>
+<span class="tg">&lt;div</span> <span class="at">class</span>=<span class="st">"group/message"</span> <span class="at">data-role</span>=<span class="st">"user"</span><span class="tg">&gt;</span>
+
+  <span class="tg">&lt;div</span> <span class="at">class</span>=<span class="st">"
+    group-data-[role=user]/message:bg-zinc-200
+    group-data-[role=user]/message:rounded-xl
+    group-data-[role=user]/message:px-3
+    group-data-[role=user]/message:py-2
+    group-data-[role=user]/message:ml-auto
+  "</span><span class="tg">&gt;</span>
+    メッセージ内容
+  <span class="tg">&lt;/div&gt;</span>
+
+<span class="tg">&lt;/div&gt;</span>
+
+<span class="cm">&lt;!-- data-role="assistant" の場合は上のクラスがすべて無効になる
+     → 背景なし・左寄せのシンプルな表示になる --&gt;</span></code></pre>
+
+    <p>Rails などのテンプレートエンジンを使えば、<code>data-role</code> を動的に埋め込むだけでスタイルが自動的に切り替わります。</p>
+
+    <pre><code><span class="cm">&lt;%# Rails ERB の例 --&gt;</span>
+<span class="tg">&lt;div</span> <span class="at">class</span>=<span class="st">"group/message"</span> <span class="at">data-role</span>=<span class="st">"&lt;%= message[:role] %&gt;"</span><span class="tg">&gt;</span>
+  ...
+<span class="tg">&lt;/div&gt;</span></code></pre>
+
+    <div class="demo-wrap">
+      <div class="demo-label">ライブデモ — user と assistant で見た目が変わる</div>
+      <div class="demo-body">
+        <div class="data-demo">
+          <div class="msg-row user">
+            <div class="msg-bubble user-bubble">こんにちは！</div>
+          </div>
+          <div class="msg-row">
+            <div class="msg-bubble ai-bubble">こんにちは！何かお手伝いできることはありますか？</div>
+          </div>
+          <div class="msg-row user">
+            <div class="msg-bubble user-bubble">group について教えてください。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">記法の読み方</div>
+      <code>group-data-[role=user]/message:bg-zinc-200</code><br><br>
+      ・ <code>group-data-[role=user]</code> ： data-role が "user" のとき<br>
+      ・ <code>/message</code> ： "message" という名前の group を参照<br>
+      ・ <code>:bg-zinc-200</code> ： 適用するスタイル
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- 6 -->
+  <section class="section" id="s6">
+    <h2>6. まとめ：どれをいつ使うか</h2>
+
+    <table>
+      <thead>
+        <tr><th>機能</th><th>使うとき</th><th>キーワード</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>group / group-hover:</code></td>
+          <td>親にホバーして子のスタイルを変えたい</td>
+          <td>カードホバー、リストアイテム</td>
+        </tr>
+        <tr>
+          <td><code>group/名前</code></td>
+          <td>group がネストしていてどの親か区別したい</td>
+          <td>コンポーネント内の複数 group</td>
+        </tr>
+        <tr>
+          <td><code>peer / peer-checked:</code></td>
+          <td>兄弟要素の状態を次の兄弟に伝えたい</td>
+          <td>チェックボックス、ラジオボタン</td>
+        </tr>
+        <tr>
+          <td><code>group-data-[attr=val]:</code></td>
+          <td>data 属性の値でスタイルを動的に切り替えたい</td>
+          <td>チャット UI、ロール別スタイル</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="final-box">
+      <h3>最初のコードを読み返してみよう</h3>
+      <p style="margin-top:.5rem">
+        記事冒頭のチャット UI のコードに戻ると、<code>group/message</code>・<code>group-data-[role=user]/message:</code>
+        がすべて読めるはずです。<br><br>
+        <code>group/message</code> で名前付きグループを定義し、<code>data-role</code> の値が <code>user</code> のときだけ
+        背景色・角丸・パディングを適用する。
+        Rails 側は <code>&lt;%= message[:role] %&gt;</code> を差し込むだけ。これだけで JS も CSS も追加せずに
+        user / assistant の見た目を切り替えています。
+      </p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  document.querySelectorAll('.peer-row input').forEach(cb => {
+    cb.addEventListener('change', function() {
+      const label = this.nextElementSibling;
+      label.style.textDecoration = this.checked ? 'line-through' : 'none';
+      label.style.color = this.checked ? '#9ca3af' : '#374151';
+    });
+  });
+</script>
+</body>
+</html>
